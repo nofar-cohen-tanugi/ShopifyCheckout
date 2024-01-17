@@ -11,12 +11,18 @@ import {
 } from '@shopify/ui-extensions-react/checkout';
 import { useState } from 'react';
 import { BannerProps } from '@shopify/ui-extensions/build/ts/surfaces/checkout/components/Banner/Banner';
+import axios from 'axios';
+
+const api = axios.create({
+	baseURL: 'https://farm-du-promotes-mason.trycloudflare.com',
+});
 
 export default reactExtension('purchase.checkout.block.render', () => <Extension />);
 
 function Extension() {
 	const [productsToSave, setProductsToSave] = useState<string[]>([]);
 	const [bannerOpts, setBannerOpts] = useState<BannerProps | null>(null);
+
 	const t = useTranslate();
 	const { checkoutToken } = useApi();
 	const cart = useCartLines();
@@ -32,35 +38,29 @@ function Extension() {
 			setProductsToSave((prev) => prev.filter((id) => id !== productId));
 		}
 	};
-
 	const handleSubmit = async () => {
 		setBannerOpts(null);
+		const body = {
+			checkoutToken: checkoutToken.current,
+			productIds: JSON.stringify(productsToSave),
+		};
+
 		try {
-			const body = {
-				checkoutToken: checkoutToken.current,
-				productIds: JSON.stringify(productsToSave),
-			};
-			console.log(body);
+			const response = await api.post('/api/save-product-for-later', body, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
 
-			const response = await fetch(
-				'https://whose-ringtones-tips-loaded.trycloudflare.com/api/save-product-for-later',
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(body),
-				}
-			);
-
-			if (!response.ok) {
+			if (!response.data) {
 				setBannerOpts({ status: 'critical', title: t('message.saveFailed') });
 				console.error(`HTTP error! Status: ${response.status}`);
+			} else {
+				const responseData = await response.data.json();
+				console.log(responseData);
+				setBannerOpts({ status: 'success', title: t('message.savedSuccessfully') });
 			}
-
-			const responseData = await response.json();
-			console.log(responseData);
-			setBannerOpts({ status: 'success', title: t('message.savedSuccessfully') });
 		} catch (error) {
 			setBannerOpts({ status: 'critical', title: t('message.saveFailed') });
 			console.error(error);

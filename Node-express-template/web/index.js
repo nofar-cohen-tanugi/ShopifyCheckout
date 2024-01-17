@@ -7,6 +7,7 @@ import webhooks from './webhooks.js';
 import { saveProductForLater } from './saveProductForLater.js';
 
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
+const BASE_URL = 'https://farm-du-promotes-mason.trycloudflare.com';
 
 const STATIC_PATH =
 	process.env.NODE_ENV === 'production'
@@ -39,6 +40,6 @@ app.use('/*', shopify.ensureInstalledOnShop(), async (_req, res) => {
 	return res.set('Content-Type', 'text/html').send(readFileSync(join(STATIC_PATH, 'index.html')));
 });
 
-app.post('/save-product-for-later', saveProductForLater);
+app.post(`${BASE_URL}/save-product-for-later`, saveProductForLater);
 
 app.listen(PORT);
