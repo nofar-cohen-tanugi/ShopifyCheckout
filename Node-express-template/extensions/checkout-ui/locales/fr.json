@@ -1,6 +1,10 @@
 {
+  "saveYourCartTitle": "Save your cart in fr",
   "form": {
     "save": "Save in fr"
   },
-  "saveYourCartTitle": "Save your cart in fr"
+  "message": {
+    "savedSuccessfully": "Saved successfully in fr",
+    "SaveFailed": "Failed to save products in fr"
+  }
 }

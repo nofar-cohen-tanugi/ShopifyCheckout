@@ -1,6 +1,10 @@
 {
+  "saveYourCartTitle": "Save your cart",
   "form": {
     "save": "Save"
   },
-  "saveYourCartTitle": "Save your cart"
+  "message": {
+    "savedSuccessfully": "Saved successfully",
+    "saveFailed": "Failed to save products"
+  }
 }
