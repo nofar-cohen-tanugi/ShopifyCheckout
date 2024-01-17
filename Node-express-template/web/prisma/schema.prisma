@@ -17,3 +17,9 @@ model Session {
   accessToken String
   userId      BigInt?
 }
+
+model ProductSaveForLater {
+  checkoutToken        String      @id
+  productIds Json
+  @@unique([checkoutToken])
+}
