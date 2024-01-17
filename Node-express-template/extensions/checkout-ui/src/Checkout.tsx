@@ -9,19 +9,21 @@ import {
 	Form,
 	BlockSpacer,
 } from '@shopify/ui-extensions-react/checkout';
-import { CartLine } from '@shopify/ui-extensions/checkout';
 import { useState } from 'react';
+import { BannerProps } from '@shopify/ui-extensions/build/ts/surfaces/checkout/components/Banner/Banner';
 
 export default reactExtension('purchase.checkout.block.render', () => <Extension />);
 
 function Extension() {
 	const [productsToSave, setProductsToSave] = useState<string[]>([]);
-
+	const [bannerOpts, setBannerOpts] = useState<BannerProps | null>(null);
 	const t = useTranslate();
-	//const { extension } = useApi();
+	const { checkoutToken } = useApi();
 	const cart = useCartLines();
 
-	const handleCheckProduct = (value: boolean, productId) => {
+	const handleCheckProduct = (value: boolean, productIdPath) => {
+		const path = productIdPath.split('/');
+		const productId = path[path.length - 1];
 		if (value) {
 			setProductsToSave((prev) => [...prev, productId]);
 		}
@@ -31,13 +33,45 @@ function Extension() {
 		}
 	};
 
-	const handleSubmit = () => {
-		console.log('submit');
-		console.log(productsToSave);
+	const handleSubmit = async () => {
+		setBannerOpts(null);
+		try {
+			const body = {
+				checkoutToken: checkoutToken.current,
+				productIds: JSON.stringify(productsToSave),
+			};
+			console.log(body);
+
+			const response = await fetch(
+				'https://whose-ringtones-tips-loaded.trycloudflare.com/api/save-product-for-later',
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(body),
+				}
+			);
+
+			if (!response.ok) {
+				setBannerOpts({ status: 'critical', title: t('message.saveFailed') });
+				console.error(`HTTP error! Status: ${response.status}`);
+			}
+
+			const responseData = await response.json();
+			console.log(responseData);
+			setBannerOpts({ status: 'success', title: t('message.savedSuccessfully') });
+		} catch (error) {
+			setBannerOpts({ status: 'critical', title: t('message.saveFailed') });
+			console.error(error);
+		}
 	};
 
 	return (
 		<Banner title={t('saveYourCartTitle')}>
+			{bannerOpts && <Banner {...bannerOpts} />}
+			<BlockSpacer spacing="base" />
+
 			<Form onSubmit={handleSubmit}>
 				{cart?.map((item) => (
 					<Checkbox
