@@ -19,7 +19,8 @@ model Session {
 }
 
 model ProductSaveForLater {
-  checkoutToken        String      @id
-  productIds Json
+  checkoutToken String @id
+  productIds    Json
+
   @@unique([checkoutToken])
 }

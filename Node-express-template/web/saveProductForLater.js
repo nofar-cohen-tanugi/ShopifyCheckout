@@ -7,9 +7,6 @@ const INTERNAL_SERVER_ERROR_STATUS = 500;
 
 export const saveProductForLater = async (req, res) => {
 	const { checkoutToken, productIds } = req.body;
-	console.log('====================================');
-	console.log(checkoutToken, productIds);
-	console.log('====================================');
 
 	try {
 		const savedProduct = await prisma.productSaveForLater.create({

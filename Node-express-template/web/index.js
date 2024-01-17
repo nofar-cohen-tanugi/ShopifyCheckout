@@ -27,9 +27,6 @@ app.post(
 	// @ts-ignore
 	shopify.processWebhooks({ webhookHandlers: webhooks })
 );
-console.log('====================================');
-console.log('serverrrrrrrrrrrrrrrrrr');
-console.log('====================================');
 
 // All endpoints after this point will require an active session
 app.use('/api/*', shopify.validateAuthenticatedSession());
@@ -42,9 +39,6 @@ app.use('/*', shopify.ensureInstalledOnShop(), async (_req, res) => {
 	return res.set('Content-Type', 'text/html').send(readFileSync(join(STATIC_PATH, 'index.html')));
 });
 
-app.post(
-	'https://whose-ringtones-tips-loaded.trycloudflare.com/api/save-product-for-later',
-	saveProductForLater
-);
+app.post('/save-product-for-later', saveProductForLater);
 
 app.listen(PORT);
